@@ -3,150 +3,193 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3D Baskı Maliyet Hesaplayıcı</title>
+    <title>BE3 Studyo - 3D Baskı Maliyet Hesaplayıcı</title>
     <style>
         * { box-sizing: border-box; font-family: system-ui, -apple-system, sans-serif; }
-        body { background: #f3f4f6; color: #111827; margin: 0; padding: 16px; }
-        .container { max-width: 520px; margin: 0 auto; background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
-        .logo-container { text-align: center; margin-bottom: 12px; background: #141414; padding: 16px 12px 12px; border-radius: 10px; }
-        h1 { font-size: 1.2rem; margin-top: 10px; color: #1f2937; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px; text-align: center; }
-        h2 { font-size: 1rem; margin: 18px 0 8px; color: #374151; }
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        body {
+            background-color: #070b14;
+            color: #f8fafc;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        .bg-orb { position: fixed; border-radius: 50%; filter: blur(85px); z-index: 0; pointer-events: none; }
+        .orb-1 { width: 420px; height: 420px; background: rgba(35, 110, 168, 0.42); top: -80px; left: -60px; }
+        .orb-2 { width: 450px; height: 450px; background: rgba(234, 120, 23, 0.25); bottom: -100px; right: -80px; }
+        .orb-3 { width: 340px; height: 340px; background: rgba(56, 189, 248, 0.28); top: 45%; left: 52%; transform: translate(-50%, -50%); }
+
+        .container {
+            position: relative; z-index: 1; width: 100%; max-width: 520px; margin: 0 auto;
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.09) 0%, rgba(255, 255, 255, 0.03) 100%);
+            backdrop-filter: blur(28px) saturate(160%); -webkit-backdrop-filter: blur(28px) saturate(160%);
+            padding: 24px; border-radius: 28px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.65), inset 0 1px 1px rgba(255, 255, 255, 0.35);
+            border: 1px solid rgba(255, 255, 255, 0.16);
+        }
+        .header-bar { display: flex; flex-direction: column; align-items: center; margin-bottom: 18px; padding-bottom: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.12); }
+        .logo-container { text-align: center; background: rgba(10, 15, 25, 0.6); padding: 12px 24px 8px; border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.12); box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.2); }
+        h1 { font-size: 1.2rem; margin: 12px 0 0; color: #f1f5f9; text-align: center; font-weight: 700; }
+
+        .app-layout { display: flex; flex-direction: column; gap: 16px; }
+        .glass-section {
+            background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.11);
+            border-radius: 20px; padding: 16px; box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.12); margin-bottom: 14px;
+        }
+        .glass-section:last-child { margin-bottom: 0; }
+        h2 { font-size: 0.85rem; margin: 0 0 12px; color: #38bdf8; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
         .field { display: flex; flex-direction: column; }
-        label { font-size: 0.8rem; color: #4b5563; margin-bottom: 4px; font-weight: 600; }
-        input, select { padding: 10px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 1rem; width: 100%; background: #fff; }
-        input:focus, select:focus { outline: none; border-color: #2563eb; }
-        .card { background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 10px; padding: 14px; margin-top: 14px; }
-        .row { display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 0.92rem; }
-        .row.total { border-top: 1px solid #d1d5db; padding-top: 8px; margin-top: 8px; font-weight: 700; font-size: 1.05rem; color: #111827; }
-        .highlight { background: #eff6ff; border-color: #bfdbfe; }
-        .price-tag { color: #1d4ed8; font-weight: 700; }
-        .profit-tag { color: #059669; font-weight: 600; }
-        .btn-save { width: 100%; margin-top: 12px; padding: 10px; background: #2563eb; color: white; border: none; border-radius: 8px; font-size: 0.95rem; font-weight: 600; cursor: pointer; }
-        .btn-save:active { background: #1d4ed8; }
-        .note { font-size: 0.75rem; color: #6b7280; margin-top: 6px; }
+        label { font-size: 0.78rem; color: #cbd5e1; margin-bottom: 5px; font-weight: 500; }
+
+        input, select {
+            padding: 11px 13px; border: 1px solid rgba(255, 255, 255, 0.16); border-radius: 14px;
+            font-size: 0.95rem; width: 100%; background: rgba(15, 23, 42, 0.4); color: #ffffff;
+            transition: all 0.2s ease; box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.25), 0 1px 0 rgba(255, 255, 255, 0.12);
+        }
+        input::placeholder { color: rgba(203, 213, 225, 0.45); }
+        input:focus, select:focus { outline: none; border-color: rgba(56, 189, 248, 0.75); background: rgba(15, 23, 42, 0.7); box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.25); }
+        select option { background: #0f172a; color: #f8fafc; }
+
+        .card {
+            background: linear-gradient(160deg, rgba(255, 255, 255, 0.08) 0%, rgba(15, 23, 42, 0.45) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 20px; padding: 18px;
+            backdrop-filter: blur(16px); box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25), inset 0 1px 1px rgba(255, 255, 255, 0.25);
+            margin-bottom: 14px;
+        }
+        .card:last-child { margin-bottom: 0; }
+        .row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-size: 0.92rem; color: #cbd5e1; }
+        .row.total { border-top: 1px solid rgba(255, 255, 255, 0.14); padding-top: 12px; margin-top: 12px; font-weight: 700; font-size: 1.05rem; color: #ffffff; }
+        .highlight { background: linear-gradient(145deg, rgba(14, 165, 233, 0.24) 0%, rgba(35, 110, 168, 0.3) 100%); border-color: rgba(56, 189, 248, 0.42); }
+        .price-tag { color: #38bdf8; font-weight: 800; font-size: 1.2rem; text-shadow: 0 0 14px rgba(56, 189, 248, 0.45); }
+        .profit-tag { color: #34d399; font-weight: 700; font-size: 1rem; }
+
+        .btn-save {
+            width: 100%; margin-top: 14px; padding: 12px;
+            background: linear-gradient(135deg, rgba(35, 110, 168, 0.9) 0%, rgba(14, 165, 233, 0.9) 100%);
+            color: white; border: 1px solid rgba(255, 255, 255, 0.28); border-radius: 14px;
+            font-size: 0.95rem; font-weight: 600; cursor: pointer;
+            box-shadow: 0 8px 20px rgba(14, 165, 233, 0.35), inset 0 1px 1px rgba(255, 255, 255, 0.4);
+        }
+        .btn-save:hover { filter: brightness(1.1); }
+        .note { font-size: 0.75rem; color: #94a3b8; margin-top: 10px; line-height: 1.45; }
+
+        @media (min-width: 768px) {
+            body { padding: 32px; }
+            .container { max-width: 1060px; padding: 30px 34px; }
+            .header-bar { flex-direction: row; justify-content: space-between; align-items: center; margin-bottom: 24px; padding-bottom: 18px; }
+            h1 { margin: 0; font-size: 1.45rem; text-align: right; }
+            .app-layout { display: grid; grid-template-columns: 1.35fr 1fr; gap: 24px; align-items: start; }
+            .results-column { position: sticky; top: 24px; }
+        }
     </style>
 </head>
 <body>
 
+<div class="bg-orb orb-1"></div>
+<div class="bg-orb orb-2"></div>
+<div class="bg-orb orb-3"></div>
+
 <div class="container">
-    <div class="logo-container">
-        <!-- BE3 Studyo Vektörel Logo -->
-        <svg width="180" height="92" viewBox="0 0 280 135" xmlns="http://www.w3.org/2000/svg" style="display:inline-block;">
-            <text x="12" y="76" font-family="Arial Black, Impact, sans-serif" font-weight="900" font-size="76" fill="#236ea8">B</text>
-            <text x="78" y="76" font-family="Arial Black, Impact, sans-serif" font-weight="900" font-size="76" fill="#ea7817">E</text>
-            <g transform="translate(142, 12)">
-                <polygon points="34,2 68,21 68,59 34,78 0,59 0,21" fill="none" stroke="#ffffff" stroke-width="5" stroke-linejoin="round"/>
-                <polyline points="0,21 34,40 68,21" fill="none" stroke="#ffffff" stroke-width="5" stroke-linejoin="round"/>
-                <line x1="34" y1="40" x2="34" y2="78" stroke="#ffffff" stroke-width="5" stroke-linecap="round"/>
-                <path d="M 17,32 C 17,23 33,23 33,33 C 33,40 23,42 23,42 C 34,42 36,50 36,57 C 37,68 19,72 9,65" fill="none" stroke="#ffffff" stroke-width="6" stroke-linecap="round"/>
-            </g>
-            <text x="135" y="118" font-family="Arial, Helvetica, sans-serif" font-weight="700" font-size="25" letter-spacing="7.5" fill="#ffffff" text-anchor="middle">STUDYO</text>
-        </svg>
-    </div>
-    <h1>3D Baskı Maliyet & Satış Hesabı</h1>
-
-    <h2>1. Baskı & Tabla Bilgileri</h2>
-    <div class="grid">
-        <div class="field">
-            <label>Tabladaki Ürün Adedi</label>
-            <input type="number" id="adet" value="" placeholder="Örn: 9" min="1" oninput="hesapla()">
+    <div class="header-bar">
+        <div class="logo-container">
+            <svg width="165" height="84" viewBox="0 0 280 135" xmlns="http://www.w3.org/2000/svg" style="display:inline-block;">
+                <text x="12" y="76" font-family="Arial Black, Impact, sans-serif" font-weight="900" font-size="76" fill="#236ea8">B</text>
+                <text x="78" y="76" font-family="Arial Black, Impact, sans-serif" font-weight="900" font-size="76" fill="#ea7817">E</text>
+                <g transform="translate(142, 12)">
+                    <polygon points="34,2 68,21 68,59 34,78 0,59 0,21" fill="none" stroke="#ffffff" stroke-width="5" stroke-linejoin="round"/>
+                    <polyline points="0,21 34,40 68,21" fill="none" stroke="#ffffff" stroke-width="5" stroke-linejoin="round"/>
+                    <line x1="34" y1="40" x2="34" y2="78" stroke="#ffffff" stroke-width="5" stroke-linecap="round"/>
+                    <path d="M 17,32 C 17,23 33,23 33,33 C 33,40 23,42 23,42 C 34,42 36,50 36,57 C 37,68 19,72 9,65" fill="none" stroke="#ffffff" stroke-width="6" stroke-linecap="round"/>
+                </g>
+                <text x="135" y="118" font-family="Arial, Helvetica, sans-serif" font-weight="700" font-size="25" letter-spacing="7.5" fill="#ffffff" text-anchor="middle">STUDYO</text>
+            </svg>
         </div>
-        <div class="field">
-            <label>Birim Gramaj (gr)</label>
-            <input type="number" id="gram" value="" placeholder="Örn: 35" step="0.1" oninput="hesapla()">
-        </div>
-        <div class="field">
-            <label>Toplam Süre (Saat)</label>
-            <input type="number" id="saat" value="" placeholder="Örn: 9" min="0" oninput="hesapla()">
-        </div>
-        <div class="field">
-            <label>Toplam Süre (Dakika)</label>
-            <input type="number" id="dakika" value="" placeholder="Örn: 30" min="0" max="59" oninput="hesapla()">
-        </div>
+        <h1>3D Baskı Maliyet & Satış Hesabı</h1>
     </div>
 
-    <h2>2. Sabit Maliyet Ayarları</h2>
-    <div class="grid">
-        <div class="field" style="grid-column: span 2;">
-            <label>Yazıcı Modeli</label>
-            <select id="yaziciModeli" onchange="modelSecildi()">
-                <option value="p1s">Bambu Lab P1S (120W | 12.00 TL/Saat)</option>
-                <option value="p1p">Bambu Lab P1P (110W | 10.00 TL/Saat)</option>
-                <option value="x1c">Bambu Lab X1 Carbon (150W | 16.00 TL/Saat)</option>
-                <option value="a1">Bambu Lab A1 / A1 Mini (100W | 6.00 TL/Saat)</option>
-                <option value="ender3">Creality Ender 3 / V2 (250W | 5.00 TL/Saat)</option>
-                <option value="other">Diğer / Manuel Giriş</option>
-            </select>
-        </div>
-        <div class="field">
-            <label>Yazıcı Gücü (Watt)</label>
-            <input type="number" id="watt" value="120" oninput="hesapla()">
-        </div>
-        <div class="field">
-            <label>Amortisman (TL/Saat)</label>
-            <input type="number" id="amortisman" value="12" step="0.5" oninput="hesapla()">
-        </div>
-        <div class="field">
-            <label>Filament Fiyatı (TL/kg)</label>
-            <input type="number" id="filamentFiyat" value="650" oninput="hesapla()">
-        </div>
-        <div class="field" style="grid-column: span 2;">
-            <label>Elektrik Tarifesi Kaynağı</label>
-            <select id="elektrikKaynak" onchange="elektrikSecildi()">
-                <option value="3.45">🇹🇷 Türkiye Güncel Ortalama (Otomatik: 3.45 TL/kWh)</option>
-                <option value="other">Manuel / Özel Elektrik Fiyatı Gir</option>
-            </select>
-        </div>
-        <div class="field" style="grid-column: span 2;">
-            <label>Elektrik Birim Fiyatı (TL/kWh)</label>
-            <input type="number" id="elektrikFiyat" value="3.45" step="0.05" oninput="hesapla()">
-        </div>
-        <div class="field" style="grid-column: span 2;">
-            <label>Ek Gider / Kutu (TL/Adet)</label>
-            <input type="number" id="ekGider" value="0" oninput="hesapla()">
-        </div>
-    </div>
-    <button class="btn-save" onclick="ayarlariKaydet()">Sabit Ayarları Hafızaya Kaydet</button>
+    <div class="app-layout">
+        <div class="inputs-column">
+            <div class="glass-section">
+                <h2>1. Baskı & Tabla Bilgileri</h2>
+                <div class="grid">
+                    <div class="field"><label>Tabladaki Ürün Adedi</label><input type="number" id="adet" placeholder="Örn: 9" min="1" oninput="hesapla()"></div>
+                    <div class="field"><label>Birim Gramaj (gr)</label><input type="number" id="gram" placeholder="Örn: 35" step="0.1" oninput="hesapla()"></div>
+                    <div class="field"><label>Toplam Süre (Saat)</label><input type="number" id="saat" placeholder="Örn: 9" min="0" oninput="hesapla()"></div>
+                    <div class="field"><label>Toplam Süre (Dakika)</label><input type="number" id="dakika" placeholder="Örn: 30" min="0" max="59" oninput="hesapla()"></div>
+                </div>
+            </div>
 
-    <h2>3. Pazaryeri & Kâr Hedefi</h2>
-    <div class="grid">
-        <div class="field">
-            <label>Hedef Net Kâr (%)</label>
-            <input type="number" id="karOran" value="100" oninput="hesapla()">
-        </div>
-        <div class="field">
-            <label>Pazaryeri Komisyonu (%)</label>
-            <input type="number" id="komisyon" value="0" oninput="hesapla()">
-        </div>
-        <div class="field" style="grid-column: span 2;">
-            <label>Kargo Ücreti (TL)</label>
-            <input type="number" id="kargo" value="0" oninput="hesapla()">
-        </div>
-    </div>
+            <div class="glass-section">
+                <h2>2. Sabit Maliyet Ayarları</h2>
+                <div class="grid">
+                    <div class="field" style="grid-column: span 2;">
+                        <label>Yazıcı Modeli</label>
+                        <select id="yaziciModeli" onchange="modelSecildi()">
+                            <option value="p1s">Bambu Lab P1S (120W | 12.00 TL/Saat)</option>
+                            <option value="p1p">Bambu Lab P1P (110W | 10.00 TL/Saat)</option>
+                            <option value="x1c">Bambu Lab X1 Carbon (150W | 16.00 TL/Saat)</option>
+                            <option value="a1">Bambu Lab A1 / A1 Mini (100W | 6.00 TL/Saat)</option>
+                            <option value="ender3">Creality Ender 3 / V2 (250W | 5.00 TL/Saat)</option>
+                            <option value="other">Diğer / Manuel Giriş (Özel Değer)</option>
+                        </select>
+                    </div>
+                    <div class="field"><label>Yazıcı Gücü (Watt)</label><input type="number" id="watt" value="120" oninput="hesapla()"></div>
+                    <div class="field"><label>Amortisman (TL/Saat)</label><input type="number" id="amortisman" value="12" step="0.5" oninput="hesapla()"></div>
+                    <div class="field"><label>Filament Fiyatı (TL/kg)</label><input type="number" id="filamentFiyat" value="650" oninput="hesapla()"></div>
+                    <div class="field"><label>Ek Gider / Kutu (TL/Adet)</label><input type="number" id="ekGider" value="0" oninput="hesapla()"></div>
+                    <div class="field" style="grid-column: span 2;">
+                        <label>Elektrik Tarifesi Kaynağı</label>
+                        <select id="elektrikKaynak" onchange="elektrikSecildi()">
+                            <option value="3.45">🇹🇷 Türkiye Güncel Ortalama (Otomatik: 3.45 TL/kWh)</option>
+                            <option value="other">Manuel / Özel Elektrik Fiyatı Gir</option>
+                        </select>
+                    </div>
+                    <div class="field" style="grid-column: span 2;"><label>Elektrik Birim Fiyatı (TL/kWh)</label><input type="number" id="elektrikFiyat" value="3.45" step="0.05" oninput="hesapla()"></div>
+                </div>
+                <button class="btn-save" onclick="ayarlariKaydet()">Sabit Ayarları Hafızaya Kaydet</button>
+            </div>
 
-    <div class="card">
-        <div class="row"><span>Birim Filament Gideri:</span><span id="sonucFilament">0.00 TL</span></div>
-        <div class="row"><span>Birim Elektrik Gideri:</span><span id="sonucElektrik">0.00 TL</span></div>
-        <div class="row"><span>Birim Amortisman Gideri:</span><span id="sonucAmortisman">0.00 TL</span></div>
-        <div class="row total"><span>1 Adet Net Üretim Maliyeti:</span><span id="sonucBirimMaliyet">0.00 TL</span></div>
-        <div class="row"><span>Tüm Tabla Toplam Maliyet:</span><span id="sonucTablaMaliyet">0.00 TL</span></div>
-    </div>
+            <div class="glass-section">
+                <h2>3. Pazaryeri & Kâr Hedefi</h2>
+                <div class="grid">
+                    <div class="field"><label>Hedef Net Kâr (%)</label><input type="number" id="karOran" value="100" oninput="hesapla()"></div>
+                    <div class="field"><label>Pazaryeri Komisyonu (%)</label><input type="number" id="komisyon" value="0" oninput="hesapla()"></div>
+                    <div class="field" style="grid-column: span 2;"><label>Kargo Ücreti (TL)</label><input type="number" id="kargo" value="0" oninput="hesapla()"></div>
+                </div>
+            </div>
+        </div>
 
-    <div class="card highlight">
-        <div class="row total">
-            <span>Doğrudan Satış Fiyatı:</span>
-            <span class="price-tag" id="fiyatDogrudan">0.00 TL</span>
+        <div class="results-column">
+            <div class="card">
+                <h2>Üretim Maliyet Özeti</h2>
+                <div class="row"><span>Birim Filament Gideri:</span><span id="sonucFilament">0.00 TL</span></div>
+                <div class="row"><span>Birim Elektrik Gideri:</span><span id="sonucElektrik">0.00 TL</span></div>
+                <div class="row"><span>Birim Amortisman Gideri:</span><span id="sonucAmortisman">0.00 TL</span></div>
+                <div class="row total"><span>1 Adet Net Üretim Maliyeti:</span><span id="sonucBirimMaliyet">0.00 TL</span></div>
+                <div class="row" style="margin-bottom: 0;"><span>Tüm Tabla Toplam Maliyet:</span><span id="sonucTablaMaliyet">0.00 TL</span></div>
+            </div>
+
+            <div class="card highlight">
+                <h2>Satış & Kâr Analizi</h2>
+                <div class="row total" style="border-top: none; padding-top: 0; margin-top: 0;">
+                    <span>Doğrudan Satış Fiyatı:</span>
+                    <span class="price-tag" id="fiyatDogrudan">0.00 TL</span>
+                </div>
+                <div class="row">
+                    <span>Doğrudan Birim / Tabla Kâr:</span>
+                    <span class="profit-tag" id="karDogrudan">0.00 TL</span>
+                </div>
+                <div class="row total" style="margin-top: 14px;">
+                    <span>Pazaryeri Etiket Fiyatı:</span>
+                    <span class="price-tag" id="fiyatPazaryeri">0.00 TL</span>
+                </div>
+                <div class="note">* Pazaryeri fiyatı; komisyon (%<span id="notKom">0</span>) ve kargo (<span id="notKargo">0</span> TL) düşüldükten sonra doğrudan satışla aynı net kârı bırakacak şekilde hesaplanır.</div>
+            </div>
         </div>
-        <div class="row">
-            <span>Doğrudan Birim / Tabla Net Kâr:</span>
-            <span class="profit-tag" id="karDogrudan">0.00 TL</span>
-        </div>
-        <div class="row total" style="margin-top:12px;">
-            <span>Pazaryeri Etiket Fiyatı:</span>
-            <span class="price-tag" id="fiyatPazaryeri">0.00 TL</span>
-        </div>
-        <div class="note">* Pazaryeri fiyatı; komisyon (%<span id="notKom">0</span>) ve kargo (<span id="notKargo">0</span> TL) düşüldükten sonra doğrudan satışla aynı net kârı bırakacak şekilde hesaplanır.</div>
     </div>
 </div>
 
@@ -158,15 +201,12 @@
         'a1': { watt: 100, amortisman: 6.0 },
         'ender3': { watt: 250, amortisman: 5.0 }
     };
-
     const ayarIdleri = ['filamentFiyat', 'elektrikFiyat', 'watt', 'amortisman', 'ekGider', 'karOran', 'komisyon', 'kargo', 'yaziciModeli', 'elektrikKaynak'];
 
     window.onload = function() {
         ayarIdleri.forEach(id => {
             const kayitli = localStorage.getItem('3d_' + id);
-            if (kayitli !== null) {
-                document.getElementById(id).value = kayitli;
-            }
+            if (kayitli !== null) document.getElementById(id).value = kayitli;
         });
         modelSecildi();
         elektrikSecildi();
@@ -177,20 +217,14 @@
         const secim = document.getElementById('yaziciModeli').value;
         const wattInput = document.getElementById('watt');
         const amortismanInput = document.getElementById('amortisman');
-        
         if (secim !== 'other' && yaziciVerileri[secim]) {
             wattInput.value = yaziciVerileri[secim].watt;
             amortismanInput.value = yaziciVerileri[secim].amortisman;
-            
-            wattInput.readOnly = true;
-            amortismanInput.readOnly = true;
-            wattInput.style.background = '#f3f4f6';
-            amortismanInput.style.background = '#f3f4f6';
+            wattInput.readOnly = true; amortismanInput.readOnly = true;
+            wattInput.style.background = 'rgba(15, 23, 42, 0.2)'; amortismanInput.style.background = 'rgba(15, 23, 42, 0.2)';
         } else {
-            wattInput.readOnly = false;
-            amortismanInput.readOnly = false;
-            wattInput.style.background = '#fff';
-            amortismanInput.style.background = '#fff';
+            wattInput.readOnly = false; amortismanInput.readOnly = false;
+            wattInput.style.background = 'rgba(15, 23, 42, 0.45)'; amortismanInput.style.background = 'rgba(15, 23, 42, 0.45)';
         }
         hesapla();
     }
@@ -198,23 +232,16 @@
     function elektrikSecildi() {
         const secim = document.getElementById('elektrikKaynak').value;
         const elektrikInput = document.getElementById('elektrikFiyat');
-        
         if (secim !== 'other') {
-            elektrikInput.value = secim;
-            elektrikInput.readOnly = true;
-            elektrikInput.style.background = '#f3f4f6';
+            elektrikInput.value = secim; elektrikInput.readOnly = true; elektrikInput.style.background = 'rgba(15, 23, 42, 0.2)';
         } else {
-            elektrikInput.readOnly = false;
-            elektrikInput.style.background = '#fff';
-            elektrikInput.focus();
+            elektrikInput.readOnly = false; elektrikInput.style.background = 'rgba(15, 23, 42, 0.45)'; elektrikInput.focus();
         }
         hesapla();
     }
 
     function ayarlariKaydet() {
-        ayarIdleri.forEach(id => {
-            localStorage.setItem('3d_' + id, document.getElementById(id).value);
-        });
+        ayarIdleri.forEach(id => localStorage.setItem('3d_' + id, document.getElementById(id).value));
         alert('Sabit ayarlarınız tarayıcı hafızasına kaydedildi!');
     }
 
@@ -223,7 +250,7 @@
         const gram = parseFloat(document.getElementById('gram').value) || 0;
         const saat = parseFloat(document.getElementById('saat').value) || 0;
         const dakika = parseFloat(document.getElementById('dakika').value) || 0;
-        
+
         const filamentFiyat = parseFloat(document.getElementById('filamentFiyat').value) || 0;
         const elektrikFiyat = parseFloat(document.getElementById('elektrikFiyat').value) || 0;
         const watt = parseFloat(document.getElementById('watt').value) || 0;
@@ -240,7 +267,7 @@
         const birimFilament = (filamentFiyat / 1000) * gram;
         const birimElektrik = birimSaat * (watt / 1000) * elektrikFiyat;
         const birimAmortisman = birimSaat * amortisman;
-        
+
         const birimMaliyet = birimFilament + birimElektrik + birimAmortisman + ekGider;
         const tablaMaliyet = birimMaliyet * adet;
 
@@ -259,11 +286,10 @@
         document.getElementById('fiyatDogrudan').innerText = dogrudanFiyat.toFixed(2) + ' TL';
         document.getElementById('karDogrudan').innerText = hedefBirimKar.toFixed(2) + ' TL / ' + tablaKar.toFixed(2) + ' TL';
         document.getElementById('fiyatPazaryeri').innerText = pazaryeriFiyat.toFixed(2) + ' TL';
-        
+
         document.getElementById('notKom').innerText = (komisyon * 100).toFixed(0);
         document.getElementById('notKargo').innerText = kargo.toFixed(0);
     }
 </script>
-
 </body>
 </html>
