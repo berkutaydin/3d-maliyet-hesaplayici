@@ -79,10 +79,10 @@
 
         @media (min-width: 768px) {
             body { padding: 32px; }
-            .container { max-width: 1060px; padding: 30px 34px; }
+            .container { max-width: 1100px; padding: 30px 34px; }
             .header-bar { flex-direction: row; justify-content: space-between; align-items: center; margin-bottom: 24px; padding-bottom: 18px; }
             h1 { margin: 0; font-size: 1.45rem; text-align: right; }
-            .app-layout { display: grid; grid-template-columns: 1.35fr 1fr; gap: 24px; align-items: start; }
+            .app-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: start; }
             .results-column { position: sticky; top: 24px; }
         }
     </style>
@@ -112,6 +112,7 @@
     </div>
 
     <div class="app-layout">
+        <!-- SOL SÜTUN: HAM GİRİŞLER -->
         <div class="inputs-column">
             <div class="glass-section">
                 <h2>1. Baskı & Tabla Bilgileri</h2>
@@ -152,7 +153,10 @@
                 </div>
                 <button class="btn-save" onclick="ayarlariKaydet()">Sabit Ayarları Hafızaya Kaydet</button>
             </div>
+        </div>
 
+        <!-- SAĞ SÜTUN: PAZARYERI & SONUÇLAR -->
+        <div class="results-column">
             <div class="glass-section">
                 <h2>3. Pazaryeri & Kâr Hedefi</h2>
                 <div class="grid">
@@ -161,9 +165,7 @@
                     <div class="field" style="grid-column: span 2;"><label>Kargo Ücreti (TL)</label><input type="number" id="kargo" value="0" oninput="hesapla()"></div>
                 </div>
             </div>
-        </div>
 
-        <div class="results-column">
             <div class="card">
                 <h2>Üretim Maliyet Özeti</h2>
                 <div class="row"><span>Birim Filament Gideri:</span><span id="sonucFilament">0.00 TL</span></div>
